@@ -1,0 +1,74 @@
+package com.qa.crm.TestBase;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.io.FileHandler;
+
+import com.qa.crm.TestUtils.TestUtils;
+
+public class TestBase {
+	public static WebDriver driver;
+	public static Properties prop;
+	static FileInputStream fis;
+	
+	public TestBase() {
+		prop = new Properties();		
+		File file = new File("C:\\Users\\dgubend\\Desktop\\Dhina\\Selenium Project\\New folder\\crmprojecttestingautomation\\src\\main\\java\\com\\qa\\crm\\config\\config.properties");
+		try {
+		fis = new FileInputStream(file);
+		}
+		catch(FileNotFoundException e) {e.printStackTrace();}		
+		try {		
+		prop.load(fis);
+		}		
+		catch(IOException e) {e.printStackTrace();
+		}
+		}
+	
+	public static WebDriver initialization() {	
+		String browserName = prop.getProperty("browser");
+		if(browserName.equals("Chrome")) {
+		System.setProperty("webdriver.chrome.driver","C:\\Users\\dgubend\\Desktop\\Dhina\\Selenium Project\\chromedriver_win32\\chromedriver.exe");
+		driver = new ChromeDriver();
+			}
+		else if (browserName.equals("FF")) {
+			driver = new FirefoxDriver();
+			}
+		driver.manage().deleteAllCookies();
+		driver.manage().timeouts().implicitlyWait(TestUtils.IMPLICIT_WAIT, TimeUnit.SECONDS);
+		
+		driver.manage().timeouts().pageLoadTimeout(TestUtils.PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
+		
+		driver.get(prop.getProperty("url"));
+		
+		driver.manage().window().maximize();
+		return driver;
+		
+		}
+	
+	public void failedTakeaSnapshot(String testMethodName) {
+		TakesScreenshot scrshot = ((TakesScreenshot)driver);
+		File srcfile = scrshot.getScreenshotAs(OutputType.FILE);
+		File dstfile = new File("C:\\Users\\dgubend\\Desktop\\Dhina\\Selenium Project\\New folder\\CRMproject\\Screenshot\\"+testMethodName+".jpg");
+		try {
+			FileHandler.copy(srcfile, dstfile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+		
+		
+	}
+		
+
+}
